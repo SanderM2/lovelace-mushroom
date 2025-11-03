@@ -39,6 +39,7 @@ export class FanPercentageControl extends LitElement {
         .disabled=${!isAvailable(this.entity)}
         .inactive=${!isActive(this.entity)}
         .showActive=${true}
+        .entityId=${this.entity.entity_id}
         @change=${this.onChange}
         @current-change=${this.onCurrentChange}
         step=${computePercentageStep(this.entity)}

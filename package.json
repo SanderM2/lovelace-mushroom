@@ -1,7 +1,7 @@
 {
-  "name": "mushroom-cards",
-  "version": "5.0.8",
-  "description": "Home Assistant Mushroom Cards",
+  "name": "mushroom-cards-knuts",
+  "version": "5.0.8-knuts",
+  "description": "Home Assistant Mushroom Cards with KNUTS modifications",
   "main": "index.js",
   "scripts": {
     "start": "rollup -c --watch --bundleConfigAsCjs",
@@ -11,10 +11,10 @@
     "start:hass": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:beta",
     "start:hass-dev": "docker run --rm -p8123:8123 -v ./.hass_dev:/config homeassistant/home-assistant:dev"
   },
-  "author": "Paul Bottein",
+  "author": "Paul Bottein (Extended by KNUTS)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/piitaya/lovelace-mushroom"
+    "url": "https://github.com/SanderM2/lovelace-mushroom"
   },
   "license": "ISC",
   "dependencies": {

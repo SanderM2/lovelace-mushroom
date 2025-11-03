@@ -12,10 +12,20 @@ import { loadHaComponents } from "../../utils/loader";
 import { COVER_CARD_EDITOR_NAME, COVER_ENTITY_DOMAINS } from "./const";
 import { CoverCardConfig, coverCardConfigStruct } from "./cover-card-config";
 
-const COVER_LABELS = [
+export const COVER_LABELS = [
   "show_buttons_control",
   "show_position_control",
   "show_tilt_position_control",
+  "show_tilt_preset_control",
+  "invert_position_slider",
+  "position_step_size",
+  "tilt_step_size",
+  "tilt_preset_button_1_icon",
+  "tilt_preset_button_1_entity",
+  "tilt_preset_button_2_icon",
+  "tilt_preset_button_2_entity",
+  "tilt_preset_button_3_icon",
+  "tilt_preset_button_3_entity",
 ];
 
 const SCHEMA: HaFormSchema[] = [
@@ -29,9 +39,19 @@ const SCHEMA: HaFormSchema[] = [
     schema: [
       { name: "show_position_control", selector: { boolean: {} } },
       { name: "show_tilt_position_control", selector: { boolean: {} } },
+      { name: "show_tilt_preset_control", selector: { boolean: {} } },
       { name: "show_buttons_control", selector: { boolean: {} } },
     ],
   },
+  { name: "invert_position_slider", selector: { boolean: {} } },
+  { name: "position_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
+  { name: "tilt_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
+  { name: "tilt_preset_button_1_icon", selector: { icon: {} } },
+  { name: "tilt_preset_button_1_entity", selector: { entity: { domain: ["switch"] } } },
+  { name: "tilt_preset_button_2_icon", selector: { icon: {} } },
+  { name: "tilt_preset_button_2_entity", selector: { entity: { domain: ["switch"] } } },
+  { name: "tilt_preset_button_3_icon", selector: { icon: {} } },
+  { name: "tilt_preset_button_3_entity", selector: { entity: { domain: ["switch"] } } },
   ...computeActionsFormSchema(),
 ];
 

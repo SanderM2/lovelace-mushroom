@@ -1,5 +1,5 @@
 node_modules
-dist
+# dist
 .hass_dev/*
 !.hass_dev/configuration.yaml
 !.hass_dev/lovelace.yaml

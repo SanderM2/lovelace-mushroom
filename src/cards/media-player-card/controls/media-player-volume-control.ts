@@ -91,6 +91,7 @@ export class MediaPlayerVolumeControls extends LitElement {
               .disabled=${!isAvailable(this.entity) || isOff(this.entity)}
               .inactive=${!isActive(this.entity)}
               .showActive=${true}
+              .entityId=${this.entity.entity_id}
               .min=${0}
               .max=${100}
               @change=${this.handleSliderChange}

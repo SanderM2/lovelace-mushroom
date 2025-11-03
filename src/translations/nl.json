@@ -14,7 +14,15 @@
       "cover": {
         "show_buttons_control": "Bedieningsknoppen?",
         "show_position_control": "Positie bediening?",
-        "show_tilt_position_control": "Kantel bediening?"
+        "show_tilt_position_control": "Kantel bediening?",
+        "show_tilt_preset_control": "Kantel voorinstellingen?",
+        "invert_position_slider": "Positie slider omdraaien?",
+        "tilt_preset_button_1_icon": "Button Preset 1 icoon",
+        "tilt_preset_button_1_entity": "Button Preset 1 switch entiteit",
+        "tilt_preset_button_2_icon": "Button Preset 2 icoon", 
+        "tilt_preset_button_2_entity": "Button Preset 2 switch entiteit",
+        "tilt_preset_button_3_icon": "Button Preset 3 icoon",
+        "tilt_preset_button_3_entity": "Button Preset 3 switch entiteit"
       },
       "empty": {
         "no_config_options": "Deze kaart heeft geen configuratie opties."

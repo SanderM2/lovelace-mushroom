@@ -1,4 +1,4 @@
-import { assign, boolean, object, optional, string } from "superstruct";
+import { assign, boolean, number, object, optional, string } from "superstruct";
 import { LovelaceCardConfig } from "../../ha";
 import {
   ActionsSharedConfig,
@@ -22,8 +22,19 @@ export type LightCardConfig = LovelaceCardConfig &
     show_brightness_control?: boolean;
     show_color_temp_control?: boolean;
     show_color_control?: boolean;
+    show_preset_control?: boolean;
     collapsible_controls?: boolean;
     use_light_color?: boolean;
+    brightness_step_size?: number;
+    color_temp_step_size?: number;
+    brightness_control_icon?: string;
+    preset_control_icon?: string;
+    preset_button_1_icon?: string;
+    preset_button_1_entity?: string;
+    preset_button_2_icon?: string;
+    preset_button_2_entity?: string;
+    preset_button_3_icon?: string;
+    preset_button_3_entity?: string;
   };
 
 export const lightCardConfigStruct = assign(
@@ -38,7 +49,18 @@ export const lightCardConfigStruct = assign(
     show_brightness_control: optional(boolean()),
     show_color_temp_control: optional(boolean()),
     show_color_control: optional(boolean()),
+    show_preset_control: optional(boolean()),
     collapsible_controls: optional(boolean()),
     use_light_color: optional(boolean()),
+    brightness_step_size: optional(number()),
+    color_temp_step_size: optional(number()),
+    brightness_control_icon: optional(string()),
+    preset_control_icon: optional(string()),
+    preset_button_1_icon: optional(string()),
+    preset_button_1_entity: optional(string()),
+    preset_button_2_icon: optional(string()),
+    preset_button_2_entity: optional(string()),
+    preset_button_3_icon: optional(string()),
+    preset_button_3_entity: optional(string()),
   })
 );

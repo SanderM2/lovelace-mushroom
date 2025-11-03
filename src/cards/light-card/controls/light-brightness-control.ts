@@ -3,12 +3,15 @@ import { customElement, property } from "lit/decorators.js";
 import { HomeAssistant, isActive, isAvailable, LightEntity } from "../../../ha";
 import "../../../shared/slider";
 import { getBrightness } from "../utils";
+import { LightCardConfig } from "../light-card-config";
 
 @customElement("mushroom-light-brightness-control")
 export class LightBrighnessControl extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ attribute: false }) public entity!: LightEntity;
+
+  @property({ attribute: false }) public config?: LightCardConfig;
 
   onChange(e: CustomEvent<{ value: number }>): void {
     const value = e.detail.value;
@@ -31,6 +34,7 @@ export class LightBrighnessControl extends LitElement {
 
   protected render(): TemplateResult {
     const brightness = getBrightness(this.entity);
+    const stepSize = this.config?.brightness_step_size ?? 5;
 
     return html`
       <mushroom-slider
@@ -38,7 +42,9 @@ export class LightBrighnessControl extends LitElement {
         .disabled=${!isAvailable(this.entity)}
         .inactive=${!isActive(this.entity)}
         .showActive=${true}
-        min=${1}
+        .entityId=${this.entity.entity_id}
+        .step=${stepSize}
+        min=${0}
         @change=${this.onChange}
         @current-change=${this.onCurrentChange}
       />

@@ -25,6 +25,7 @@ import "../shared/state-item";
 import { computeAppearance } from "./appearance";
 import { MushroomBaseElement } from "./base-element";
 import { computeInfoDisplay } from "./info";
+import { stateBlockManager } from "./state-block-manager";
 
 type BaseConfig = EntitySharedConfig & AppearanceSharedConfig;
 
@@ -290,12 +291,13 @@ export class MushroomBaseCard<
     stateObj: HassEntity,
     appearance: Appearance,
     name: string,
-    state?: string
+    state?: string,
+    allowExternalUpdate: boolean = true
   ): TemplateResult | null {
     const defaultState = this.hass.formatEntityState(stateObj);
-
     const displayState = state ?? defaultState;
 
+    // Always compute primary info (never blocked)
     const primary = computeInfoDisplay(
       appearance.primary_info,
       name,
@@ -304,13 +306,55 @@ export class MushroomBaseCard<
       this.hass
     );
 
-    const secondary = computeInfoDisplay(
-      appearance.secondary_info,
-      name,
-      displayState,
-      stateObj,
-      this.hass
-    );
+    // Check if external updates are blocked for this specific entity
+    let secondary;
+    if (allowExternalUpdate && stateBlockManager.isEntityBlocked(stateObj.entity_id)) {
+      // Use slider value for secondary info when blocked
+      const sliderValue = stateBlockManager.getSliderValue(stateObj.entity_id);
+      if (sliderValue !== undefined) {
+        // Format slider value appropriately based on entity type
+        let formattedSliderValue = sliderValue.toString();
+        
+        // Add unit/formatting based on entity domain
+        if (stateObj.entity_id.startsWith('light.')) {
+          if (sliderValue <= 1) {
+            formattedSliderValue = `${Math.round(sliderValue * 100)}%`; // Brightness
+          } else {
+            formattedSliderValue = `${Math.round(sliderValue)}%`; // Already percentage
+          }
+        } else if (stateObj.entity_id.startsWith('cover.')) {
+          formattedSliderValue = `${Math.round(sliderValue)}%`;
+        } else if (stateObj.entity_id.startsWith('fan.')) {
+          formattedSliderValue = `${Math.round(sliderValue)}%`;
+        } else if (stateObj.entity_id.startsWith('media_player.')) {
+          formattedSliderValue = `${Math.round(sliderValue)}%`;
+        } else {
+          // For number entities and others, use the value with unit if available
+          const unit = stateObj.attributes.unit_of_measurement || '';
+          formattedSliderValue = `${sliderValue}${unit}`;
+        }
+        
+        secondary = formattedSliderValue;
+      } else {
+        // Fallback to normal secondary if no slider value
+        secondary = computeInfoDisplay(
+          appearance.secondary_info,
+          name,
+          displayState,
+          stateObj,
+          this.hass
+        );
+      }
+    } else {
+      // Normal secondary info when not blocked
+      secondary = computeInfoDisplay(
+        appearance.secondary_info,
+        name,
+        displayState,
+        stateObj,
+        this.hass
+      );
+    }
 
     return html`
       <mushroom-state-info
@@ -319,5 +363,15 @@ export class MushroomBaseCard<
         .secondary=${secondary}
       ></mushroom-state-info>
     `;
+  }
+
+  // Helper method for internal state updates that bypass blocking
+  protected renderStateInfoInternal(
+    stateObj: HassEntity,
+    appearance: Appearance,
+    name: string,
+    state?: string
+  ): TemplateResult | null {
+    return this.renderStateInfo(stateObj, appearance, name, state, false);
   }
 }

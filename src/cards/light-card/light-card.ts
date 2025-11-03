@@ -42,6 +42,7 @@ import {
 import "./controls/light-brightness-control";
 import "./controls/light-color-control";
 import "./controls/light-color-temp-control";
+import "./controls/light-preset-control";
 import { LightCardConfig } from "./light-card-config";
 import {
   getRGBColor,
@@ -55,12 +56,14 @@ import {
 type LightCardControl =
   | "brightness_control"
   | "color_temp_control"
-  | "color_control";
+  | "color_control"
+  | "preset_control";
 
 const CONTROLS_ICONS: Record<LightCardControl, string> = {
   brightness_control: "mdi:brightness-4",
   color_temp_control: "mdi:thermometer",
   color_control: "mdi:palette",
+  preset_control: "mdi:format-list-numbered",
 };
 
 registerCustomCard({
@@ -96,6 +99,17 @@ export class LightCard
 
   @state() private brightness?: number;
 
+  private getControlIcon(control: LightCardControl): string {
+    switch (control) {
+      case "brightness_control":
+        return this._config?.brightness_control_icon || CONTROLS_ICONS.brightness_control;
+      case "preset_control":
+        return this._config?.preset_control_icon || CONTROLS_ICONS.preset_control;
+      default:
+        return CONTROLS_ICONS[control] || "mdi:cog";
+    }
+  }
+
   private get _controls(): LightCardControl[] {
     if (!this._config || !this._stateObj) return [];
 
@@ -115,6 +129,10 @@ export class LightCard
     }
     if (this._config.show_color_control && supportsColorControl(stateObj)) {
       controls.push("color_control");
+    }
+    // Add preset control if enabled in config
+    if (this._config.show_preset_control) {
+      controls.push("preset_control");
     }
     return controls;
   }
@@ -288,7 +306,7 @@ export class LightCard
       ${otherControls.map(
         (ctrl) => html`
           <mushroom-button @click=${(e) => this._onControlTap(ctrl, e)}>
-            <ha-icon .icon=${CONTROLS_ICONS[ctrl]}></ha-icon>
+            <ha-icon .icon=${this.getControlIcon(ctrl)}></ha-icon>
           </mushroom-button>
         `
       )}
@@ -323,6 +341,7 @@ export class LightCard
           <mushroom-light-brightness-control
             .hass=${this.hass}
             .entity=${entity}
+            .config=${this._config}
             style=${styleMap(sliderStyle)}
             @current-change=${this.onCurrentBrightnessChange}
           />
@@ -332,11 +351,42 @@ export class LightCard
           <mushroom-light-color-temp-control
             .hass=${this.hass}
             .entity=${entity}
+            .config=${this._config}
           />
         `;
       case "color_control":
         return html`
           <mushroom-light-color-control .hass=${this.hass} .entity=${entity} />
+        `;
+      case "preset_control":
+        const lightRgbColorPreset = getRGBColor(entity);
+        const presetStyle = {};
+        const iconColorPreset = this._config?.icon_color;
+        if (lightRgbColorPreset && this._config?.use_light_color) {
+          const color = lightRgbColorPreset.join(",");
+          presetStyle["--slider-color"] = `rgb(${color})`;
+          presetStyle["--slider-bg-color"] = `rgba(${color}, 0.2)`;
+          if (
+            isColorLight(lightRgbColorPreset) &&
+            !(this.hass.themes as any).darkMode
+          ) {
+            presetStyle["--slider-bg-color"] =
+              `rgba(var(--rgb-primary-text-color), 0.05)`;
+            presetStyle["--slider-color"] =
+              `rgba(var(--rgb-primary-text-color), 0.15)`;
+          }
+        } else if (iconColorPreset) {
+          const iconRgbColor = computeRgbColor(iconColorPreset);
+          presetStyle["--slider-color"] = `rgb(${iconRgbColor})`;
+          presetStyle["--slider-bg-color"] = `rgba(${iconRgbColor}, 0.2)`;
+        }
+        return html`
+          <mushroom-light-preset-control
+            .hass=${this.hass}
+            .entity=${entity}
+            .config=${this._config}
+            style=${styleMap(presetStyle)}
+          />
         `;
       default:
         return nothing;
@@ -357,7 +407,8 @@ export class LightCard
         }
         mushroom-light-brightness-control,
         mushroom-light-color-temp-control,
-        mushroom-light-color-control {
+        mushroom-light-color-control,
+        mushroom-light-preset-control {
           flex: 1;
         }
       `,

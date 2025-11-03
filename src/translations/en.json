@@ -22,7 +22,17 @@
       "cover": {
         "show_buttons_control": "Control buttons?",
         "show_position_control": "Position control?",
-        "show_tilt_position_control": "Tilt control?"
+        "show_tilt_position_control": "Tilt control?",
+        "show_tilt_preset_control": "Tilt presets?",
+        "invert_position_slider": "Invert position slider?",
+        "position_step_size": "Position step size",
+        "tilt_step_size": "Tilt step size",
+        "tilt_preset_button_1_icon": "Button Preset 1 icon",
+        "tilt_preset_button_1_entity": "Button Preset 1 switch entity",
+        "tilt_preset_button_2_icon": "Button Preset 2 icon",
+        "tilt_preset_button_2_entity": "Button Preset 2 switch entity", 
+        "tilt_preset_button_3_icon": "Button Preset 3 icon",
+        "tilt_preset_button_3_entity": "Button Preset 3 switch entity"
       },
       "empty": {
         "no_config_options": "This card has no config options."
@@ -57,7 +67,18 @@
         "show_brightness_control": "Brightness control?",
         "show_color_control": "Color control?",
         "show_color_temp_control": "Color temperature control?",
-        "use_light_color": "Use light color"
+        "show_preset_control": "Preset buttons?",
+        "use_light_color": "Use light color",
+        "brightness_step_size": "Brightness step size",
+        "color_temp_step_size": "Color temperature step size",
+        "brightness_control_icon": "Brightness control icon",
+        "preset_control_icon": "Preset control icon",
+        "preset_button_1_icon": "Preset Button 1 icon",
+        "preset_button_1_entity": "Preset Button 1 switch entity",
+        "preset_button_2_icon": "Preset Button 2 icon",
+        "preset_button_2_entity": "Preset Button 2 switch entity",
+        "preset_button_3_icon": "Preset Button 3 icon",
+        "preset_button_3_entity": "Preset Button 3 switch entity"
       },
       "lock": {
         "lock": "Lock",

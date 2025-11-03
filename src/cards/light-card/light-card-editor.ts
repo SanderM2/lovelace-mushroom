@@ -17,6 +17,17 @@ export const LIGHT_LABELS = [
   "use_light_color",
   "show_color_temp_control",
   "show_color_control",
+  "show_preset_control",
+  "brightness_step_size",
+  "color_temp_step_size",
+  "brightness_control_icon",
+  "preset_control_icon",
+  "preset_button_1_icon",
+  "preset_button_1_entity",
+  "preset_button_2_icon", 
+  "preset_button_2_entity",
+  "preset_button_3_icon",
+  "preset_button_3_entity",
 ];
 
 const SCHEMA: HaFormSchema[] = [
@@ -43,9 +54,20 @@ const SCHEMA: HaFormSchema[] = [
       { name: "show_brightness_control", selector: { boolean: {} } },
       { name: "show_color_temp_control", selector: { boolean: {} } },
       { name: "show_color_control", selector: { boolean: {} } },
+      { name: "show_preset_control", selector: { boolean: {} } },
       { name: "collapsible_controls", selector: { boolean: {} } },
     ],
   },
+  { name: "brightness_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
+  { name: "color_temp_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
+  { name: "brightness_control_icon", selector: { icon: {} } },
+  { name: "preset_control_icon", selector: { icon: {} } },
+  { name: "preset_button_1_icon", selector: { icon: {} } },
+  { name: "preset_button_1_entity", selector: { entity: { domain: "switch" } } },
+  { name: "preset_button_2_icon", selector: { icon: {} } },
+  { name: "preset_button_2_entity", selector: { entity: { domain: "switch" } } },
+  { name: "preset_button_3_icon", selector: { icon: {} } },
+  { name: "preset_button_3_entity", selector: { entity: { domain: "switch" } } },
   ...computeActionsFormSchema(),
 ];
 

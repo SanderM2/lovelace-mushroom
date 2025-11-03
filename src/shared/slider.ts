@@ -11,6 +11,7 @@ import { customElement, property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { styleMap } from "lit/directives/style-map.js";
 import "hammerjs";
+import { stateBlockManager } from "../utils/state-block-manager";
 
 const getPercentageFromEvent = (e: HammerInput) => {
   const x = e.center.x;
@@ -44,13 +45,16 @@ export class SliderItem extends LitElement {
   public value?: number;
 
   @property({ type: Number })
-  public step: number = 1;
+  public step: number = 5;
 
   @property({ type: Number })
   public min: number = 0;
 
   @property({ type: Number })
   public max: number = 100;
+
+  @property({ type: String, attribute: "entity-id" })
+  public entityId?: string;
 
   private _mc?: HammerManager;
 
@@ -61,7 +65,9 @@ export class SliderItem extends LitElement {
   }
 
   percentageToValue(value: number) {
-    return (this.max - this.min) * value + this.min;
+    const rawValue = (this.max - this.min) * value + this.min;
+    // Round to step size immediately
+    return Math.round(rawValue / this.step) * this.step;
   }
 
   protected firstUpdated(changedProperties: PropertyValues): void {
@@ -101,20 +107,32 @@ export class SliderItem extends LitElement {
         if (this.disabled) return;
         this.controlled = true;
         savedValue = this.value;
+        // Block external state updates for this entity during slider interaction
+        if (this.entityId) {
+          stateBlockManager.blockEntityUpdates(this.entityId, this.value);
+        }
       });
       this._mc.on("pancancel", () => {
         if (this.disabled) return;
         this.controlled = false;
         this.value = savedValue;
+        // Unblock external state updates
+        if (this.entityId) {
+          stateBlockManager.unblockEntityUpdates(this.entityId);
+        }
       });
       this._mc.on("panmove", (e) => {
         if (this.disabled) return;
         const percentage = getPercentageFromEvent(e);
         this.value = this.percentageToValue(percentage);
+        if (this.entityId) {
+          // Update the slider value in the state manager
+          stateBlockManager.updateSliderValue(this.entityId, this.value);
+        }
         this.dispatchEvent(
           new CustomEvent("current-change", {
             detail: {
-              value: Math.round(this.value / this.step) * this.step,
+              value: this.value,
             },
           })
         );
@@ -123,10 +141,12 @@ export class SliderItem extends LitElement {
         if (this.disabled) return;
         this.controlled = false;
         const percentage = getPercentageFromEvent(e);
-        // Prevent from input releasing on a value that doesn't lie on a step
-        this.value =
-          Math.round(this.percentageToValue(percentage) / this.step) *
-          this.step;
+        // Value already rounded by percentageToValue
+        this.value = this.percentageToValue(percentage);
+        // Unblock external state updates before final events
+        if (this.entityId) {
+          stateBlockManager.unblockEntityUpdates(this.entityId);
+        }
         this.dispatchEvent(
           new CustomEvent("current-change", {
             detail: {

@@ -1,14 +1,37 @@
-# 🍄 Mushroom
+# 🍄 Mushroom KNUTS
 
 [![hacs][hacs-badge]][hacs-url]
 [![release][release-badge]][release-url]
 ![downloads][downloads-badge]
 ![build][build-badge]
-[![translations][translations-badge]][weblate-url]
 
-<a href="https://www.buymeacoffee.com/piitaya" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/white_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+> **This is an extended version of the original Mushroom Cards by piitaya with additional cover tilt preset functionality by KNUTS.**
 
 ![Overview](https://user-images.githubusercontent.com/5878303/152332130-760cf616-5c40-4825-a482-bb8f1f0f5251.png)
+
+## What's New in This Extended Version?
+
+### ✨ Enhanced Cover Card Features
+- **Tilt preset buttons** with configurable switch entities and custom button names
+- **Position inversion option** for inverted cover position display and control
+- **Improved state display** showing percentages for intermediate positions
+- **Better tilt control** with visual feedback and toggle functionality
+
+### 🎛️ Enhanced Light Card Features  
+- **Preset control buttons** with configurable switch entities
+- **Configurable control icons** for brightness and preset controls
+- **Improved slider behavior** with better value retention during interactions
+
+### 🔧 Universal Slider Improvements
+- **Configurable step sizes** for all sliders (brightness, volume, humidity, etc.) with default of 5
+- **Enhanced dragging behavior** with per-entity state blocking to prevent value jumping
+- **Smooth slider interactions** that maintain values during drag operations
+
+### 🛠️ Technical Enhancements
+- **Per-entity state blocking manager** prevents external Home Assistant updates from interfering with slider interactions
+- **Improved HACS compatibility** with proper configuration
+- **Built-in distribution** with pre-compiled mushroom.js file
+- **All features are backward compatible** - original functionality remains intact
 
 ## What is mushroom ?
 
@@ -26,27 +49,25 @@ Mushroom mission is to propose easy to use components to build your [Home Assist
 - 🌓 Light and dark theme support
 - 🎨 Optional theme customization
 - 🌎 Internationalization
+- **🆕 Enhanced cover controls** with tilt presets and position inversion (Extended version)
+- **🆕 Light preset controls** with configurable switch entities (Extended version)
+- **🆕 Configurable slider step sizes** for all cards (Extended version)
+- **🆕 Improved slider behavior** with anti-interference protection (Extended version)
 
 The goal of Mushroom is not to provide custom card for deep customization. You can use the excellent [UI Lovelace Minimalist][ui-lovelace-minimalist] and [Button card][button-card] plugins for this.
 
 ## Installation
 
-### HACS
-
-Mushroom is available in [HACS][hacs] (Home Assistant Community Store).
-
-Use this link to directly go to the repository in HACS
-
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=piitaya&repository=lovelace-mushroom)
-
-_or_
+### HACS (Custom Repository)
 
 1. Install HACS if you don't have it already
-2. Open HACS in Home Assistant
-3. Search for "Mushroom"
-4. Click the download button. ⬇️
-
-### Manual
+2. Go to HACS → Frontend
+3. Click the three dots in the top right corner
+4. Select "Custom repositories"
+5. Add this repository URL: `https://github.com/SanderM2/lovelace-mushroom`
+6. Select category: "Lovelace"
+7. Click "Add"
+7. Find "Mushroom KNUTS" and install it
 
 1. Download `mushroom.js` file from the [latest release][release-url].
 2. Put `mushroom.js` file into your `config/www` folder.
@@ -59,6 +80,126 @@ _or_
        - url: /local/mushroom.js
          type: module
      ```
+
+## Extended Features Usage
+
+### Cover Card Enhancements
+
+#### Tilt Presets
+Add preset buttons for quick tilt positioning:
+
+```yaml
+type: custom:mushroom-cover-card
+entity: cover.your_cover
+show_tilt_preset_control: true
+tilt_preset_1:
+  name: "Closed"
+  entity: switch.cover_preset_closed
+tilt_preset_2: 
+  name: "Half"
+  entity: switch.cover_preset_half
+tilt_preset_3:
+  name: "Open"
+  entity: switch.cover_preset_open
+```
+
+#### Position Inversion
+Invert position display and control for covers that report inverted values:
+
+```yaml
+type: custom:mushroom-cover-card
+entity: cover.your_cover
+show_position_control: true
+invert_position: true
+```
+
+#### Enhanced State Display
+The cover card now shows:
+- "Closed" for 0% position
+- "Open" for 100% position  
+- Percentage values for intermediate positions
+- Properly inverted display when `invert_position` is enabled
+
+### Light Card Enhancements
+
+#### Preset Controls
+Add preset buttons for quick scene/mood activation:
+
+```yaml
+type: custom:mushroom-light-card
+entity: light.your_light
+show_preset_control: true
+preset_1:
+  name: "Bright"
+  entity: switch.light_preset_bright
+preset_2:
+  name: "Dim" 
+  entity: switch.light_preset_dim
+preset_3:
+  name: "Night"
+  entity: switch.light_preset_night
+```
+
+#### Configurable Control Icons
+Customize the icons for brightness and preset controls:
+
+```yaml
+type: custom:mushroom-light-card
+entity: light.your_light
+show_brightness_control: true
+show_preset_control: true
+brightness_icon: mdi:brightness-6
+preset_icon: mdi:palette
+```
+
+### Universal Slider Step Configuration
+
+Configure step sizes for all slider controls across different card types:
+
+```yaml
+type: custom:mushroom-light-card
+entity: light.your_light
+show_brightness_control: true
+brightness_step: 10  # 10% steps instead of default 5%
+```
+
+```yaml
+type: custom:mushroom-media-player-card
+entity: media_player.your_player
+show_volume_control: true
+volume_step: 5  # 5% volume steps
+```
+
+This works for:
+- **Light cards**: `brightness_step`
+- **Media player cards**: `volume_step`  
+- **Fan cards**: `percentage_step`
+- **Humidifier cards**: `humidity_step`
+- **Number cards**: `number_step`
+- **Cover cards**: `position_step`, `tilt_step`
+
+### Combined Example
+
+```yaml
+type: custom:mushroom-cover-card
+entity: cover.bedroom_blinds
+show_position_control: true
+show_tilt_position_control: true  
+show_tilt_preset_control: true
+show_buttons_control: true
+invert_position: true
+position_step: 10
+tilt_step: 25
+tilt_preset_1:
+  name: "Privacy"
+  entity: switch.blinds_privacy_mode
+tilt_preset_2:
+  name: "Light"
+  entity: switch.blinds_light_mode
+tilt_preset_3:
+  name: "Open"
+  entity: switch.blinds_open_mode
+```
 
 ## Usage
 

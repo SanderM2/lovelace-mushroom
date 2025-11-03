@@ -16,6 +16,7 @@ import {
   temperature2rgb,
 } from "../../../ha/common/color/convert-light-color";
 import "../../../shared/slider";
+import { LightCardConfig } from "../light-card-config";
 
 export const generateColorTemperatureGradient = (min: number, max: number) => {
   const count = 10;
@@ -43,6 +44,8 @@ export class LightColorTempControl extends LitElement {
 
   @property({ attribute: false }) public entity!: LightEntity;
 
+  @property({ attribute: false }) public config?: LightCardConfig;
+
   onChange(e: CustomEvent<{ value: number }>): void {
     e.stopPropagation();
     const value = e.detail.value;
@@ -69,15 +72,17 @@ export class LightColorTempControl extends LitElement {
       this.entity.attributes.max_color_temp_kelvin ?? DEFAULT_MAX_KELVIN;
 
     const gradient = this._generateTemperatureGradient(minKelvin!, maxKelvin);
+    const stepSize = this.config?.color_temp_step_size ?? 5;
 
-    console.log(gradient);
     return html`
       <mushroom-slider
         .value=${colorTemp}
         .disabled=${!isAvailable(this.entity)}
         .inactive=${!isActive(this.entity)}
+        .entityId=${this.entity.entity_id}
         .min=${minKelvin}
         .max=${maxKelvin}
+        .step=${stepSize}
         .showIndicator=${true}
         @change=${this.onChange}
         style=${styleMap({

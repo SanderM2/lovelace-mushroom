@@ -10,6 +10,7 @@ import { customElement, property } from "lit/decorators.js";
 import { CoverEntity, HomeAssistant, isAvailable } from "../../../ha";
 import "../../../shared/slider";
 import { getTiltPosition } from "../utils";
+import { CoverCardConfig } from "../cover-card-config";
 
 function createTiltSliderTrackBackgroundGradient(
   count: number = 24,
@@ -43,6 +44,8 @@ export class CoverTiltPositionControl extends LitElement {
 
   @property({ attribute: false }) public entity!: CoverEntity;
 
+  @property({ attribute: false }) public config?: CoverCardConfig;
+
   private onChange(e: CustomEvent<{ value: number }>): void {
     const value = e.detail.value;
 
@@ -65,12 +68,15 @@ export class CoverTiltPositionControl extends LitElement {
 
   protected render(): TemplateResult {
     const tilt = getTiltPosition(this.entity);
+    const stepSize = this.config?.tilt_step_size ?? 5;
 
     return html`
       <mushroom-slider
         .value=${tilt}
         .disabled=${!isAvailable(this.entity)}
         .showIndicator=${true}
+        .entityId=${this.entity.entity_id}
+        .step=${stepSize}
         @change=${this.onChange}
         @current-change=${this.onCurrentChange}
       />

@@ -81,6 +81,7 @@ export class LightColorControl extends LitElement {
         .value=${colorPercent}
         .disabled=${!isAvailable(this.entity)}
         .inactive=${!isActive(this.entity)}
+        .entityId=${this.entity.entity_id}
         .min=${0}
         .max=${100}
         .showIndicator=${true}
