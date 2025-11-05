@@ -1,4 +1,5 @@
 import { assign, boolean, object, optional, string } from "superstruct";
+import { ActionConfig, actionConfigStruct } from "../../ha";
 import {
   ActionsSharedConfig,
   actionsSharedConfigStruct,
@@ -19,6 +20,9 @@ export type EntityCardConfig = LovelaceCardConfig &
   AppearanceSharedConfig &
   ActionsSharedConfig & {
     icon_color?: string;
+    icon_tap_action?: ActionConfig;
+    icon_hold_action?: ActionConfig;
+    icon_double_tap_action?: ActionConfig;
   };
 
 export const entityCardConfigStruct = assign(
@@ -30,5 +34,8 @@ export const entityCardConfigStruct = assign(
   ),
   object({
     icon_color: optional(string()),
+    icon_tap_action: optional(actionConfigStruct),
+    icon_hold_action: optional(actionConfigStruct),
+    icon_double_tap_action: optional(actionConfigStruct),
   })
 );

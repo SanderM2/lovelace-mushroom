@@ -28,7 +28,22 @@ const SCHEMA: HaFormSchema[] = [
     ],
   },
   ...APPEARANCE_FORM_SCHEMA,
-  ...computeActionsFormSchema(),
+  {
+    type: "expandable",
+    name: "",
+    title: "Icon Actions",
+    schema: [
+      { name: "icon_tap_action", selector: { ui_action: {} } },
+      { name: "icon_hold_action", selector: { ui_action: {} } },
+      { name: "icon_double_tap_action", selector: { ui_action: {} } },
+    ],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Card Actions",
+    schema: computeActionsFormSchema(),
+  },
 ];
 
 @customElement(ENTITY_CARD_EDITOR_NAME)

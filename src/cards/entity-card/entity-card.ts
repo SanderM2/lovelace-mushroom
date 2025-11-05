@@ -40,6 +40,9 @@ export class EntityCard
   extends MushroomBaseCard<EntityCardConfig>
   implements LovelaceCard
 {
+  // Icon action handling
+  private _lastIconActionTime = 0;
+  private _lastIconActionType: string | null = null;
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     await import("./entity-card-editor");
     return document.createElement(
@@ -59,6 +62,58 @@ export class EntityCard
 
   private _handleAction(ev: ActionHandlerEvent) {
     handleAction(this, this.hass!, this._config!, ev.detail.action!);
+  }
+
+  private _handleIconAction(ev: any): void {
+    const now = Date.now();
+    const actionType = ev.detail.action;
+    
+    // Always prevent event bubbling to card body first
+    ev.stopPropagation();
+    
+    // Debounce: ignore if same action within 500ms
+    if (now - this._lastIconActionTime < 500 && actionType === this._lastIconActionType) {
+      return;
+    }
+    this._lastIconActionTime = now;
+    this._lastIconActionType = actionType;
+    
+    const iconActionConfig = {
+      entity: this._config?.entity || '',
+      tap_action: this._config?.icon_tap_action || { action: 'none' },
+      hold_action: this._config?.icon_hold_action || { action: 'none' },
+      double_tap_action: this._config?.icon_double_tap_action || { action: 'none' },
+    };
+    
+    if (!this.hass) return;
+    
+    handleAction(this, this.hass, iconActionConfig, ev.detail.action);
+  }
+
+  private get _hasIconAction() {
+    return (
+      hasAction(this._config?.icon_tap_action) ||
+      hasAction(this._config?.icon_hold_action) ||
+      hasAction(this._config?.icon_double_tap_action)
+    );
+  }
+
+  public setConfig(config: EntityCardConfig): void {
+    super.setConfig({
+      tap_action: {
+        action: "more-info",
+      },
+      hold_action: {
+        action: "more-info",
+      },
+      icon_tap_action: {
+        action: "more-info",
+      },
+      icon_double_tap_action: {
+        action: "none",
+      },
+      ...config,
+    });
   }
 
   protected render() {
@@ -119,6 +174,11 @@ export class EntityCard
         slot="icon"
         .disabled=${!active}
         style=${styleMap(iconStyle)}
+        @action=${this._hasIconAction ? this._handleIconAction : undefined}
+        .actionHandler=${this._hasIconAction ? actionHandler({
+          hasHold: hasAction(this._config!.icon_hold_action),
+          hasDoubleClick: hasAction(this._config!.icon_double_tap_action),
+        }) : undefined}
       >
         <ha-state-icon
           .hass=${this.hass}
