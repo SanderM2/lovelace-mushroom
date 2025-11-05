@@ -16,11 +16,13 @@
 - **Position inversion option** for inverted cover position display and control
 - **Improved state display** showing percentages for intermediate positions
 - **Better tilt control** with visual feedback and toggle functionality
+- **Separate icon actions** allowing different actions for icon vs card body (e.g., icon = toggle, card = more-info)
 
 ### 🎛️ Enhanced Light Card Features  
 - **Preset control buttons** with configurable switch entities
 - **Configurable control icons** for brightness and preset controls
 - **Improved slider behavior** with better value retention during interactions
+- **Separate icon actions** allowing different actions for icon vs card body (e.g., icon = toggle, card = more-info)
 
 ### 🔧 Universal Slider Improvements
 - **Configurable step sizes** for all sliders (brightness, volume, humidity, etc.) with default of 5
@@ -53,6 +55,7 @@ Mushroom mission is to propose easy to use components to build your [Home Assist
 - **🆕 Light preset controls** with configurable switch entities (Extended version)
 - **🆕 Configurable slider step sizes** for all cards (Extended version)
 - **🆕 Improved slider behavior** with anti-interference protection (Extended version)
+- **🆕 Separate icon actions** for Light and Cover cards allowing different behaviors for icon vs card (Extended version)
 
 The goal of Mushroom is not to provide custom card for deep customization. You can use the excellent [UI Lovelace Minimalist][ui-lovelace-minimalist] and [Button card][button-card] plugins for this.
 
@@ -200,6 +203,55 @@ tilt_preset_3:
   name: "Open"
   entity: switch.blinds_open_mode
 ```
+
+### Icon Actions (Light & Cover Cards)
+
+Configure separate actions for the card icon vs the card body, enabling different behaviors:
+
+#### Light Card Icon Actions
+```yaml
+type: custom:mushroom-light-card
+entity: light.bedroom
+# Card actions (when clicking card body)
+tap_action:
+  action: more-info
+hold_action:
+  action: more-info
+# Icon actions (when clicking the light icon)
+icon_tap_action:
+  action: toggle  # Quick toggle on/off
+icon_hold_action:
+  action: more-info
+icon_double_tap_action:
+  action: none
+```
+
+#### Cover Card Icon Actions  
+```yaml
+type: custom:mushroom-cover-card
+entity: cover.bedroom_blinds
+# Card actions (when clicking card body)
+tap_action:
+  action: more-info
+hold_action:
+  action: more-info
+# Icon actions (when clicking the cover icon)
+icon_tap_action:
+  action: more-info  # Show cover details
+icon_hold_action:
+  action: none
+icon_double_tap_action:
+  action: call-service
+  service: cover.stop_cover
+  target:
+    entity_id: cover.bedroom_blinds
+```
+
+**Benefits:**
+- **Separate controls**: Icon and card body can perform different actions
+- **No visual feedback circle**: Clean desktop experience without unwanted visual effects  
+- **Cross-platform compatibility**: Works seamlessly on both desktop and mobile
+- **Customizable actions**: Support for tap, hold, and double-tap actions on icons
 
 ## Usage
 

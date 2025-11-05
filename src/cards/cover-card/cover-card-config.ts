@@ -1,4 +1,5 @@
 import { assign, boolean, number, object, optional, string } from "superstruct";
+import { ActionConfig, actionConfigStruct } from "../../ha";
 import {
   actionsSharedConfigStruct,
   ActionsSharedConfig,
@@ -31,6 +32,9 @@ export type CoverCardConfig = LovelaceCardConfig &
     tilt_preset_button_2_entity?: string;
     tilt_preset_button_3_icon?: string;
     tilt_preset_button_3_entity?: string;
+    icon_tap_action?: ActionConfig;
+    icon_hold_action?: ActionConfig;
+    icon_double_tap_action?: ActionConfig;
   };
 
 export const coverCardConfigStruct = assign(
@@ -54,5 +58,8 @@ export const coverCardConfigStruct = assign(
     tilt_preset_button_2_entity: optional(string()),
     tilt_preset_button_3_icon: optional(string()),
     tilt_preset_button_3_entity: optional(string()),
+    icon_tap_action: optional(actionConfigStruct),
+    icon_hold_action: optional(actionConfigStruct),
+    icon_double_tap_action: optional(actionConfigStruct),
   })
 );

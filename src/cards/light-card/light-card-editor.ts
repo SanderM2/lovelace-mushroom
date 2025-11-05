@@ -28,6 +28,9 @@ export const LIGHT_LABELS = [
   "preset_button_2_entity",
   "preset_button_3_icon",
   "preset_button_3_entity",
+  "icon_tap_action",
+  "icon_hold_action", 
+  "icon_double_tap_action",
 ];
 
 const SCHEMA: HaFormSchema[] = [
@@ -62,13 +65,35 @@ const SCHEMA: HaFormSchema[] = [
   { name: "color_temp_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
   { name: "brightness_control_icon", selector: { icon: {} } },
   { name: "preset_control_icon", selector: { icon: {} } },
-  { name: "preset_button_1_icon", selector: { icon: {} } },
-  { name: "preset_button_1_entity", selector: { entity: { domain: "switch" } } },
-  { name: "preset_button_2_icon", selector: { icon: {} } },
-  { name: "preset_button_2_entity", selector: { entity: { domain: "switch" } } },
-  { name: "preset_button_3_icon", selector: { icon: {} } },
-  { name: "preset_button_3_entity", selector: { entity: { domain: "switch" } } },
-  ...computeActionsFormSchema(),
+  {
+    type: "expandable",
+    name: "",
+    title: "Preset Buttons",
+    schema: [
+      { name: "preset_button_1_icon", selector: { icon: {} } },
+      { name: "preset_button_1_entity", selector: { entity: { domain: "switch" } } },
+      { name: "preset_button_2_icon", selector: { icon: {} } },
+      { name: "preset_button_2_entity", selector: { entity: { domain: "switch" } } },
+      { name: "preset_button_3_icon", selector: { icon: {} } },
+      { name: "preset_button_3_entity", selector: { entity: { domain: "switch" } } },
+    ],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Icon Actions",
+    schema: [
+      { name: "icon_tap_action", selector: { ui_action: {} } },
+      { name: "icon_hold_action", selector: { ui_action: {} } },
+      { name: "icon_double_tap_action", selector: { ui_action: {} } },
+    ],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Card Actions",
+    schema: computeActionsFormSchema(),
+  },
 ];
 
 @customElement(LIGHT_CARD_EDITOR_NAME)

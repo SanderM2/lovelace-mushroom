@@ -8,6 +8,7 @@ import {
 } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { styleMap } from "lit/directives/style-map.js";
 import {
   actionHandler,
@@ -99,6 +100,9 @@ export class LightCard
 
   @state() private brightness?: number;
 
+  private _lastIconActionTime = 0;
+  private _lastIconActionType = '';
+
   private getControlIcon(control: LightCardControl): string {
     switch (control) {
       case "brightness_control":
@@ -141,16 +145,22 @@ export class LightCard
     return this._controls.length > 0;
   }
 
-  setConfig(config: LightCardConfig): void {
-    super.setConfig({
+  public setConfig(config: LightCardConfig): void {
+    this._config = {
       tap_action: {
-        action: "toggle",
+        action: "more-info",
       },
       hold_action: {
         action: "more-info",
       },
+      icon_tap_action: {
+        action: "toggle",
+      },
+      icon_double_tap_action: {
+        action: "none",
+      },
       ...config,
-    });
+    };
     this.updateActiveControl();
     this.updateBrightness();
   }
@@ -193,6 +203,40 @@ export class LightCard
 
   private _handleAction(ev: ActionHandlerEvent) {
     handleAction(this, this.hass!, this._config!, ev.detail.action!);
+  }
+
+  private _handleIconAction(ev: any): void {
+    const now = Date.now();
+    const actionType = ev.detail.action;
+    
+    // Always prevent event bubbling to card body first
+    ev.stopPropagation();
+    
+    // Debounce: ignore if same action within 500ms
+    if (now - this._lastIconActionTime < 500 && actionType === this._lastIconActionType) {
+      return;
+    }
+    this._lastIconActionTime = now;
+    this._lastIconActionType = actionType;
+    
+    const iconActionConfig = {
+      entity: this._config?.entity || '',
+      tap_action: this._config?.icon_tap_action || { action: 'none' },
+      hold_action: this._config?.icon_hold_action || { action: 'none' },
+      double_tap_action: this._config?.icon_double_tap_action || { action: 'none' },
+    };
+    
+    if (!this.hass) return;
+    
+    handleAction(this, this.hass, iconActionConfig, ev.detail.action);
+  }
+
+  private get _hasIconAction() {
+    return (
+      hasAction(this._config?.icon_tap_action) ||
+      hasAction(this._config?.icon_hold_action) ||
+      hasAction(this._config?.icon_double_tap_action)
+    );
   }
 
   protected render() {
@@ -265,6 +309,7 @@ export class LightCard
     const active = isActive(stateObj);
     const iconStyle = {};
     const iconColor = this._config?.icon_color;
+    
     if (lightRgbColor && this._config?.use_light_color) {
       const color = lightRgbColor.join(",");
       iconStyle["--icon-color"] = `rgb(${color})`;
@@ -287,6 +332,11 @@ export class LightCard
         slot="icon"
         .disabled=${!active}
         style=${styleMap(iconStyle)}
+        @action=${this._hasIconAction ? this._handleIconAction : undefined}
+        .actionHandler=${this._hasIconAction ? actionHandler({
+          hasHold: hasAction(this._config!.icon_hold_action),
+          hasDoubleClick: hasAction(this._config!.icon_double_tap_action),
+        }) : undefined}
       >
         <ha-state-icon
           .hass=${this.hass}

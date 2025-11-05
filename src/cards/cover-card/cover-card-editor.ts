@@ -46,13 +46,35 @@ const SCHEMA: HaFormSchema[] = [
   { name: "invert_position_slider", selector: { boolean: {} } },
   { name: "position_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
   { name: "tilt_step_size", selector: { number: { min: 1, max: 100, mode: "box" } } },
-  { name: "tilt_preset_button_1_icon", selector: { icon: {} } },
-  { name: "tilt_preset_button_1_entity", selector: { entity: { domain: ["switch"] } } },
-  { name: "tilt_preset_button_2_icon", selector: { icon: {} } },
-  { name: "tilt_preset_button_2_entity", selector: { entity: { domain: ["switch"] } } },
-  { name: "tilt_preset_button_3_icon", selector: { icon: {} } },
-  { name: "tilt_preset_button_3_entity", selector: { entity: { domain: ["switch"] } } },
-  ...computeActionsFormSchema(),
+  {
+    type: "expandable",
+    name: "",
+    title: "Tilt Preset Buttons",
+    schema: [
+      { name: "tilt_preset_button_1_icon", selector: { icon: {} } },
+      { name: "tilt_preset_button_1_entity", selector: { entity: { domain: ["switch"] } } },
+      { name: "tilt_preset_button_2_icon", selector: { icon: {} } },
+      { name: "tilt_preset_button_2_entity", selector: { entity: { domain: ["switch"] } } },
+      { name: "tilt_preset_button_3_icon", selector: { icon: {} } },
+      { name: "tilt_preset_button_3_entity", selector: { entity: { domain: ["switch"] } } },
+    ],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Icon Actions",
+    schema: [
+      { name: "icon_tap_action", selector: { ui_action: {} } },
+      { name: "icon_hold_action", selector: { ui_action: {} } },
+      { name: "icon_double_tap_action", selector: { ui_action: {} } },
+    ],
+  },
+  {
+    type: "expandable",
+    name: "",
+    title: "Card Actions",
+    schema: computeActionsFormSchema(),
+  },
 ];
 
 @customElement(COVER_CARD_EDITOR_NAME)

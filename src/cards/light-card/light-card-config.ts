@@ -1,5 +1,5 @@
 import { assign, boolean, number, object, optional, string } from "superstruct";
-import { LovelaceCardConfig } from "../../ha";
+import { ActionConfig, actionConfigStruct, LovelaceCardConfig } from "../../ha";
 import {
   ActionsSharedConfig,
   actionsSharedConfigStruct,
@@ -18,6 +18,9 @@ export type LightCardConfig = LovelaceCardConfig &
   EntitySharedConfig &
   AppearanceSharedConfig &
   ActionsSharedConfig & {
+    icon_tap_action?: ActionConfig;
+    icon_hold_action?: ActionConfig;
+    icon_double_tap_action?: ActionConfig;
     icon_color?: string;
     show_brightness_control?: boolean;
     show_color_temp_control?: boolean;
@@ -45,6 +48,9 @@ export const lightCardConfigStruct = assign(
     actionsSharedConfigStruct
   ),
   object({
+    icon_tap_action: optional(actionConfigStruct),
+    icon_hold_action: optional(actionConfigStruct),
+    icon_double_tap_action: optional(actionConfigStruct),
     icon_color: optional(string()),
     show_brightness_control: optional(boolean()),
     show_color_temp_control: optional(boolean()),
