@@ -10,24 +10,17 @@ import {
 import { customElement, property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { styleMap } from "lit/directives/style-map.js";
-import "hammerjs";
 import { stateBlockManager } from "../utils/state-block-manager";
 
-const getPercentageFromEvent = (e: HammerInput) => {
-  const x = e.center.x;
-  const offset = e.target.getBoundingClientRect().left;
-  const total = e.target.clientWidth;
+const getPercentageFromEvent = (e: PointerEvent, target: HTMLElement) => {
+  const x = e.clientX;
+  const rect = target.getBoundingClientRect();
+  const offset = rect.left;
+  const total = rect.width;
   return Math.max(Math.min(1, (x - offset) / total), 0);
 };
 
 export const DEFAULT_SLIDER_THRESHOLD = 10;
-const getSliderThreshold = (element: any): number | undefined => {
-  const thresholdValue = window
-    .getComputedStyle(element)
-    .getPropertyValue("--slider-threshold");
-  const threshold = parseFloat(thresholdValue);
-  return isNaN(threshold) ? DEFAULT_SLIDER_THRESHOLD : threshold;
-};
 
 @customElement("mushroom-slider")
 export class SliderItem extends LitElement {
@@ -56,7 +49,15 @@ export class SliderItem extends LitElement {
   @property({ type: String, attribute: "entity-id" })
   public entityId?: string;
 
-  private _mc?: HammerManager;
+  private _isDragging: boolean = false;
+  private _startValue?: number;
+  private _pointerId?: number;
+
+  // Bound event handlers to avoid binding issues
+  private _boundPointerDown = this._handlePointerDown.bind(this);
+  private _boundPointerMove = this._handlePointerMove.bind(this);
+  private _boundPointerUp = this._handlePointerUp.bind(this);
+  private _boundClick = this._handleClick.bind(this);
 
   @state() controlled: boolean = false;
 
@@ -89,103 +90,148 @@ export class SliderItem extends LitElement {
   private slider;
 
   setupListeners() {
-    if (this.slider && !this._mc) {
-      const threshold = getSliderThreshold(this.slider);
-      this._mc = new Hammer.Manager(this.slider, { touchAction: "pan-y" });
-      this._mc.add(
-        new Hammer.Pan({
-          threshold,
-          direction: Hammer.DIRECTION_ALL,
-          enable: true,
-        })
-      );
-
-      this._mc.add(new Hammer.Tap({ event: "singletap" }));
-
-      let savedValue;
-      this._mc.on("panstart", () => {
-        if (this.disabled) return;
-        this.controlled = true;
-        savedValue = this.value;
-        // Block external state updates for this entity during slider interaction
-        if (this.entityId) {
-          stateBlockManager.blockEntityUpdates(this.entityId, this.value);
-        }
-      });
-      this._mc.on("pancancel", () => {
-        if (this.disabled) return;
-        this.controlled = false;
-        this.value = savedValue;
-        // Unblock external state updates
-        if (this.entityId) {
-          stateBlockManager.unblockEntityUpdates(this.entityId);
-        }
-      });
-      this._mc.on("panmove", (e) => {
-        if (this.disabled) return;
-        const percentage = getPercentageFromEvent(e);
-        this.value = this.percentageToValue(percentage);
-        if (this.entityId) {
-          // Update the slider value in the state manager
-          stateBlockManager.updateSliderValue(this.entityId, this.value);
-        }
-        this.dispatchEvent(
-          new CustomEvent("current-change", {
-            detail: {
-              value: this.value,
-            },
-          })
-        );
-      });
-      this._mc.on("panend", (e) => {
-        if (this.disabled) return;
-        this.controlled = false;
-        const percentage = getPercentageFromEvent(e);
-        // Value already rounded by percentageToValue
-        this.value = this.percentageToValue(percentage);
-        // Unblock external state updates before final events
-        if (this.entityId) {
-          stateBlockManager.unblockEntityUpdates(this.entityId);
-        }
-        this.dispatchEvent(
-          new CustomEvent("current-change", {
-            detail: {
-              value: undefined,
-            },
-          })
-        );
-        this.dispatchEvent(
-          new CustomEvent("change", {
-            detail: {
-              value: this.value,
-            },
-          })
-        );
-      });
-
-      this._mc.on("singletap", (e) => {
-        if (this.disabled) return;
-        const percentage = getPercentageFromEvent(e);
-        // Prevent from input selecting a value that doesn't lie on a step
-        this.value =
-          Math.round(this.percentageToValue(percentage) / this.step) *
-          this.step;
-        this.dispatchEvent(
-          new CustomEvent("change", {
-            detail: {
-              value: this.value,
-            },
-          })
-        );
-      });
+    if (this.slider) {
+      // Add event listeners for pointer events
+      this.slider.addEventListener('pointerdown', this._boundPointerDown);
+      this.slider.addEventListener('click', this._boundClick);
+      
+      // Set CSS to prevent default touch actions
+      this.slider.style.touchAction = 'none'; // Prevent all default behaviors
     }
   }
 
   destroyListeners() {
-    if (this._mc) {
-      this._mc.destroy();
-      this._mc = undefined;
+    if (this.slider) {
+      this.slider.removeEventListener('pointerdown', this._boundPointerDown);
+      this.slider.removeEventListener('click', this._boundClick);
     }
+    // Always clean up global listeners
+    this._removeGlobalListeners();
+  }
+
+  private _removeGlobalListeners() {
+    document.removeEventListener('pointermove', this._boundPointerMove);
+    document.removeEventListener('pointerup', this._boundPointerUp);
+    document.removeEventListener('pointercancel', this._boundPointerUp);
+  }
+
+  private _handlePointerDown(e: PointerEvent) {
+    if (this.disabled || this._isDragging) return;
+    
+    // Only handle primary pointer (left mouse button, first finger)
+    if (!e.isPrimary) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    this._isDragging = true;
+    this.controlled = true;
+    this._startValue = this.value;
+    this._pointerId = e.pointerId;
+    
+    // Block external state updates for this entity during slider interaction
+    if (this.entityId) {
+      stateBlockManager.blockEntityUpdates(this.entityId, this.value);
+    }
+    
+    // Add global listeners for move and up events
+    document.addEventListener('pointermove', this._boundPointerMove, { passive: false });
+    document.addEventListener('pointerup', this._boundPointerUp);
+    document.addEventListener('pointercancel', this._boundPointerUp);
+    
+    // Capture the pointer to this element for reliable tracking
+    try {
+      this.slider.setPointerCapture(e.pointerId);
+    } catch (error) {
+      // Ignore errors from setPointerCapture
+    }
+  }
+
+  private _handlePointerMove(e: PointerEvent) {
+    if (!this._isDragging || this.disabled) return;
+    
+    // Only handle the pointer we're tracking
+    if (e.pointerId !== this._pointerId) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const percentage = getPercentageFromEvent(e, this.slider);
+    this.value = this.percentageToValue(percentage);
+    
+    if (this.entityId) {
+      stateBlockManager.updateSliderValue(this.entityId, this.value);
+    }
+    
+    this.dispatchEvent(
+      new CustomEvent("current-change", {
+        detail: { value: this.value },
+      })
+    );
+  }
+
+  private _handlePointerUp(e: PointerEvent) {
+    if (!this._isDragging || this.disabled) return;
+    
+    // Only handle the pointer we're tracking
+    if (e.pointerId !== this._pointerId) return;
+    
+    this._isDragging = false;
+    this.controlled = false;
+    
+    // Calculate final value
+    const percentage = getPercentageFromEvent(e, this.slider);
+    this.value = this.percentageToValue(percentage);
+    
+    // Unblock external state updates before final events
+    if (this.entityId) {
+      stateBlockManager.unblockEntityUpdates(this.entityId);
+    }
+    
+    // Clean up
+    this._removeGlobalListeners();
+    this._pointerId = undefined;
+    
+    // Release pointer capture if it was set
+    try {
+      if (this.slider.hasPointerCapture(e.pointerId)) {
+        this.slider.releasePointerCapture(e.pointerId);
+      }
+    } catch (error) {
+      // Ignore errors
+    }
+    
+    // Dispatch final events
+    this.dispatchEvent(
+      new CustomEvent("current-change", {
+        detail: { value: undefined },
+      })
+    );
+    
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        detail: { value: this.value },
+      })
+    );
+  }
+
+  private _handleClick(e: PointerEvent) {
+    // Prevent click after drag
+    if (this.disabled || this._isDragging) return;
+    
+    // Small delay to ensure we're not in the middle of a drag operation
+    setTimeout(() => {
+      if (this._isDragging) return;
+      
+      const percentage = getPercentageFromEvent(e, this.slider);
+      this.value = Math.round(this.percentageToValue(percentage) / this.step) * this.step;
+      
+      this.dispatchEvent(
+        new CustomEvent("change", {
+          detail: { value: this.value },
+        })
+      );
+    }, 10);
   }
 
   protected render(): TemplateResult {

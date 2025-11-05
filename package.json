@@ -1,6 +1,6 @@
 {
   "name": "mushroom-cards-knuts",
-  "version": "5.0.8-knuts",
+  "version": "5.0.8-knuts-1.1",
   "description": "Home Assistant Mushroom Cards with KNUTS modifications",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,6 @@
     "@material/mwc-select": "^0.27.0",
     "@material/mwc-textfield": "^0.27.0",
     "culori": "^4.0.1",
-    "hammerjs": "^2.0.8",
     "home-assistant-js-websocket": "^9.5.0",
     "intl-messageformat": "^10.7.16",
     "lit": "^3.3.1",
@@ -41,7 +40,6 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/culori": "^4.0.1",
-    "@types/hammerjs": "^2.0.46",
     "eslint": "^9.36.0",
     "prettier": "^3.6.2",
     "rollup": "^4.50.1",

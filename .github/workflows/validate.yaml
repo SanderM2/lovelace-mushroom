@@ -1,8 +1,9 @@
 name: HACS validation
 on:
     push:
-        branches:
-            - main
+        tags:
+            - "v*.*.*"
+    workflow_dispatch:
 jobs:
     validate:
         runs-on: ubuntu-latest
