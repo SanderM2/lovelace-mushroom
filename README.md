@@ -24,6 +24,10 @@
 - **Improved slider behavior** with better value retention during interactions
 - **Separate icon actions** allowing different actions for icon vs card body (e.g., icon = toggle, card = more-info)
 
+### 🎯 Enhanced Entity Card Features
+- **Separate icon actions** allowing different actions for icon vs card body (e.g., icon = more-info, card = more-info)
+- **Configurable tap, hold, and double-tap actions** for icons independent of card actions
+
 ### 🔧 Universal Slider Improvements
 - **Configurable step sizes** for all sliders (brightness, volume, humidity, etc.) with default of 5
 - **Enhanced dragging behavior** with per-entity state blocking to prevent value jumping
@@ -55,7 +59,7 @@ Mushroom mission is to propose easy to use components to build your [Home Assist
 - **🆕 Light preset controls** with configurable switch entities (Extended version)
 - **🆕 Configurable slider step sizes** for all cards (Extended version)
 - **🆕 Improved slider behavior** with anti-interference protection (Extended version)
-- **🆕 Separate icon actions** for Light and Cover cards allowing different behaviors for icon vs card (Extended version)
+- **🆕 Separate icon actions** for Light, Cover, and Entity cards allowing different behaviors for icon vs card (Extended version)
 
 The goal of Mushroom is not to provide custom card for deep customization. You can use the excellent [UI Lovelace Minimalist][ui-lovelace-minimalist] and [Button card][button-card] plugins for this.
 
@@ -204,7 +208,7 @@ tilt_preset_3:
   entity: switch.blinds_open_mode
 ```
 
-### Icon Actions (Light & Cover Cards)
+### Icon Actions (Light, Cover & Entity Cards)
 
 Configure separate actions for the card icon vs the card body, enabling different behaviors:
 
@@ -245,6 +249,24 @@ icon_double_tap_action:
   service: cover.stop_cover
   target:
     entity_id: cover.bedroom_blinds
+```
+
+#### Entity Card Icon Actions
+```yaml
+type: custom:mushroom-entity-card
+entity: switch.living_room_lamp
+# Card actions (when clicking card body)  
+tap_action:
+  action: more-info
+hold_action:
+  action: more-info
+# Icon actions (when clicking the entity icon)
+icon_tap_action:
+  action: toggle  # Quick toggle switch
+icon_hold_action:
+  action: more-info
+icon_double_tap_action:
+  action: none
 ```
 
 **Benefits:**
