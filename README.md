@@ -33,6 +33,14 @@
 - **Enhanced dragging behavior** with per-entity state blocking to prevent value jumping
 - **Smooth slider interactions** that maintain values during drag operations
 
+### 📊 Enhanced Gauge Card Features (NEW!)
+- **Horizontal gauge display** with configurable segments and colors
+- **Visual needle indicator** with triangular markers pointing to current value
+- **Color segments** for different value ranges (e.g., green for good, red for danger)
+- **Fill option** to show progress as colored fill
+- **Configurable range** with custom min/max values
+- **Smooth animations** for needle movement and value changes
+
 ### 🛠️ Technical Enhancements
 - **Per-entity state blocking manager** prevents external Home Assistant updates from interfering with slider interactions
 - **Improved HACS compatibility** with proper configuration
@@ -295,7 +303,8 @@ Different cards are available for differents entities :
 - 🪄 [Entity card](docs/cards/entity.md)
 - 🕳 [Empty card](docs/cards/empty.md)
 - 💨 [Fan card](docs/cards/fan.md)
-- 💧 [Humidifier card](docs/cards/humidifier.md)
+- � [Gauge card](docs/cards/gauge.md) **NEW!**
+- �💧 [Humidifier card](docs/cards/humidifier.md)
 - 💡 [Light card](docs/cards/light.md)
 - 🔒 [Lock card](docs/cards/lock.md)
 - 📺 [Media card](docs/cards/media-player.md)

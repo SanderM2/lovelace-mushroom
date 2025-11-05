@@ -113,6 +113,15 @@
           "slider": "Slider"
         }
       },
+      "gauge": {
+        "min": "Minimum value",
+        "max": "Maximum value", 
+        "unit": "Unit",
+        "needle": "Show needle",
+        "needle_color": "Needle color",
+        "fill": "Show fill bar",
+        "gauge_settings": "Gauge Settings"
+      },
       "template": {
         "area_helper": "Used in templates and features",
         "area": "Area",

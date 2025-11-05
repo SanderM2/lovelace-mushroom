@@ -12,6 +12,7 @@ import "./cards/cover-card/cover-card";
 import "./cards/empty-card/empty-card";
 import "./cards/entity-card/entity-card";
 import "./cards/fan-card/fan-card";
+import "./cards/gauge-card/gauge-card";
 import "./cards/humidifier-card/humidifier-card";
 import "./cards/legacy-template-card/legacy-template-card";
 import "./cards/light-card/light-card";
