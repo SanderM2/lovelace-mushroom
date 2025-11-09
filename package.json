@@ -1,6 +1,6 @@
 {
   "name": "mushroom-cards-knuts",
-  "version": "5.0.8-knuts-1.15",
+  "version": "5.0.8-knuts-1.16",
   "description": "Home Assistant Mushroom Cards with KNUTS modifications",
   "main": "index.js",
   "scripts": {

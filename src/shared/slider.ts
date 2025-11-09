@@ -57,7 +57,7 @@ export class SliderItem extends LitElement {
   private _boundPointerDown = this._handlePointerDown.bind(this);
   private _boundPointerMove = this._handlePointerMove.bind(this);
   private _boundPointerUp = this._handlePointerUp.bind(this);
-  private _boundClick = this._handleClick.bind(this);
+  //private _boundClick = this._handleClick.bind(this);
 
   @state() controlled: boolean = false;
 
@@ -93,7 +93,7 @@ export class SliderItem extends LitElement {
     if (this.slider) {
       // Add event listeners for pointer events
       this.slider.addEventListener('pointerdown', this._boundPointerDown);
-      this.slider.addEventListener('click', this._boundClick);
+      //this.slider.addEventListener('click', this._boundClick);
       
       // Set CSS to prevent default touch actions
       this.slider.style.touchAction = 'none'; // Prevent all default behaviors
@@ -103,7 +103,7 @@ export class SliderItem extends LitElement {
   destroyListeners() {
     if (this.slider) {
       this.slider.removeEventListener('pointerdown', this._boundPointerDown);
-      this.slider.removeEventListener('click', this._boundClick);
+      //this.slider.removeEventListener('click', this._boundClick);
     }
     // Always clean up global listeners
     this._removeGlobalListeners();
@@ -215,6 +215,7 @@ export class SliderItem extends LitElement {
     );
   }
 
+  /*
   private _handleClick(e: PointerEvent) {
     // Prevent click after drag
     if (this.disabled || this._isDragging) return;
@@ -233,6 +234,7 @@ export class SliderItem extends LitElement {
       );
     }, 10);
   }
+  */
 
   protected render(): TemplateResult {
     return html`
